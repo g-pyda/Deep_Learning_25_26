@@ -29,7 +29,7 @@ if __name__ == "__main__":
     model = CNNBuilder(config["model_layers"]).to(device)
 
     # model training
-    train(model, train_loader, device)
+    train(model, train_ds, device)
 
     # model evaluation
-    test(model, test_loader, device)
+    test(model, test_ds, device)

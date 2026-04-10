@@ -48,7 +48,7 @@ data:
 # - type - type of the layer (e.g., Conv2d, MaxPool2d, Linear)
 # - [parameters] - specific parameters for the layer type (e.g., out_channels, kernel_size for Conv2d)
 # - batch_norm - whether to apply batch normalization after the layer
-# - activation - activation function to apply after the layer (e.g., ReLU, Sigmoid)
+# - activation - activation function to apply after the layer (e.g., relu, sigmoid)
 model_layers:
   - name: "conv1"
     type: "Conv2d"
@@ -57,7 +57,7 @@ model_layers:
     stride: 1
     padding: 1
     batch_norm: true
-    activation: "ReLU"
+    activation: "relu"
   - name: "pool1"
     type: "MaxPool2d"
     kernel_size: 2
