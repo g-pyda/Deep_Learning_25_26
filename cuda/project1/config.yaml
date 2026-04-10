@@ -1,0 +1,95 @@
+# ------------------------------------------------------------------------------
+# EXPERIMENT CONFIGURATION
+# ------------------------------------------------------------------------------
+
+# BASIC CONFIGURATION
+# configuration of basic options for the training pipeline
+basic:
+  study_name: "simple_cnn_experiment"
+  study_description: |
+    This experiment trains a simple CNN on the MNIST dataset to demonstrate the training pipeline.
+    This is a multiline description...
+  random_seed: 42
+  num_workers: 4
+  save_model: true
+  load_model_path: null
+
+# LOGGING CONFIGURATION
+# configuration of logging options for the training pipeline
+logging:
+  time_logging: true
+  gpu_logging: true
+  error_logging: true
+  epoch_logging: true
+
+# DATA CONFIGURATION
+# configuration of data loading and transformation options for the training pipeline
+# path - path to the data directory
+# train(test)_transforms - information about the data transformations with their type and parameters
+data:
+  path: "/home/stud2023/3pyda/sem6/cuda/project1/data"
+  train_transforms:
+    - type: "ToTensor"
+    - type: "RandomRotation"
+      value: 15
+    - type: "RandomHorizontalFlip"
+      value: 0.5
+    - type: "RandomCenterCrop"
+      value: [28, 28]
+    - type: "RandomResize"
+      value: [28, 28]
+    - type: "Normalize"
+      value: [0.5 ,0.5]
+  test_transforms: null
+
+# MODEL LAYERS CONFIGURATION
+# configuration of model layers (for dynamic model construction)
+# - name - unique identifier for the layer
+# - type - type of the layer (e.g., Conv2d, MaxPool2d, Linear)
+# - [parameters] - specific parameters for the layer type (e.g., out_channels, kernel_size for Conv2d)
+# - batch_norm - whether to apply batch normalization after the layer
+# - activation - activation function to apply after the layer (e.g., ReLU, Sigmoid)
+model_layers:
+  - name: "conv1"
+    type: "Conv2d"
+    out_channels: 16
+    kernel_size: 3
+    stride: 1
+    padding: 1
+    batch_norm: true
+    activation: "ReLU"
+  - name: "pool1"
+    type: "MaxPool2d"
+    kernel_size: 2
+    stride: 2
+    padding: 0
+    batch_norm: false
+    activation: null
+
+# HYPERPARAMETERS CONFIGURATION
+# configuration of hyperparameters for the training pipeline
+# Note: the study will perform iteration over ALL COMBINATIONS of hyperparameters provided
+hyperparameters:
+  learning_rate: [0.001, 0.0001]
+  batch_size: [64, 128]
+  num_epochs: [10, 20]
+  optimizer: ["Adam", "SGD"]
+  weight_decay: [0, 0.0001]
+
+# RESULTS CONFIGURATION
+# configuration of TensorBoard results to save
+results:
+  train_loss: true
+  val_loss: true
+  train_acc: true
+  val_acc: true
+  param_histograms:
+    conv1:
+      weights: true
+      biases: true
+  batches:
+    1:
+      input: true
+      output: true
+
+  
