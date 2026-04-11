@@ -11,8 +11,7 @@ basic:
     This is a multiline description...
   random_seed: 42
   num_workers: 4
-  save_model: true
-  load_model_path: null
+
 
 # LOGGING CONFIGURATION
 # configuration of logging options for the training pipeline
@@ -20,7 +19,6 @@ logging:
   time_logging: true
   gpu_logging: true
   error_logging: true
-  epoch_logging: true
 
 # DATA CONFIGURATION
 # configuration of data loading and transformation options for the training pipeline
@@ -69,6 +67,7 @@ model_layers:
 # HYPERPARAMETERS CONFIGURATION
 # configuration of hyperparameters for the training pipeline
 # Note: the study will perform iteration over ALL COMBINATIONS of hyperparameters provided
+# accepted optimizers: Adam, Sgd, AdamW, RMSProp, Adagrad, Adadelta
 hyperparameters:
   learning_rate: [0.001, 0.0001]
   batch_size: [64, 128]
@@ -79,6 +78,7 @@ hyperparameters:
 # RESULTS CONFIGURATION
 # configuration of TensorBoard results to save
 results:
+  basepath: "./runs/"
   train_loss: true
   val_loss: true
   train_acc: true

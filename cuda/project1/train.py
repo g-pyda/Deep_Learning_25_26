@@ -4,22 +4,34 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 import torchvision.utils as vutils
 from torch import nn, optim
+from torch.utils.data import DataLoader
 
-def train(model, train_loader, device):
+def train(model, train_data, device, hpset, num_workers):
+    # getting the training assets
+    batch_size, optimizer, num_epochs = get_train_assets(hpset, model)
+
+    # creating the data loader
+    train_loader = DataLoader(
+        train_data,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers
+        )
+
     # Create a TensorBoard writer
     writer = SummaryWriter(log_dir="runs/baseline_experiment")
 
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     criterion = nn.CrossEntropyLoss()
 
-    for epoch in range(10):
+    for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
 
         for data, target in train_loader:
             data, target = data.to(device), target.to(device)
 
-            optimizer.zero_grad() # PyTorch accumulates gradients by default, so we need to clear them before computing new ones
+            optimizer.zero_grad()
             output = model(data)
             loss = criterion(output, target)
             loss.backward()
@@ -74,3 +86,55 @@ def test(model, test_loader, device):
             correct += (predicted == target).sum().item()
 
     print(f"Test Accuracy: {100 * correct / total:.2f}%")
+
+
+# =======================================
+# HELPERS
+# =======================================
+
+def get_train_assets(hpset, model):
+    batch_size = hpset.get("batch_size")
+    num_epochs = hpset.get("num_epochs")
+    opt = hpset.get("optimizer")
+    optimizer = None
+    match opt:
+        case "Adam":
+            optimizer = optim.Adam(
+                model.parameters(),
+                lr=hpset.get("learning_rate"),
+                weight_decay=hpset.get("weight_decay")
+            )
+        case "SGD" | "Sgd":
+            optimizer = optim.SGD(
+                model.parameters(),
+                lr=hpset.get("learning_rate"),
+                weight_decay=hpset.get("weight_decay")
+            )
+        case "AdamW":
+            optimizer = optim.AdamW(
+                model.parameters(),
+                lr=hpset.get("learning_rate"),
+                weight_decay=hpset.get("weight_decay")
+            )
+        case "RMSProp":
+            optimizer = optim.RMSprop(
+                model.parameters(),
+                lr=hpset.get("learning_rate"),
+                weight_decay=hpset.get("weight_decay")
+            )
+        case "Adagrad":
+            optimizer = optim.Adagrad(
+                model.parameters(),
+                lr=hpset.get("learning_rate"),
+                weight_decay=hpset.get("weight_decay")
+            )
+        case "Adadelta":
+            optimizer = optim.Adadelta(
+                model.parameters(),
+                lr=hpset.get("learning_rate"),
+                weight_decay=hpset.get("weight_decay")
+            )
+        case _:
+            raise ValueError(f"Unknown optimizer: {opt}")
+
+    return batch_size, optimizer, num_epochs
