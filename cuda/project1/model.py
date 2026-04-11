@@ -3,10 +3,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functionals as F
 
+from utils import error_logger, basic_logger, global_log
+
 # ===============================================
 # IMPORTED FUNCTIONS
 # ===============================================
 
+@basic_logger(global_log)
+@error_logger(global_log.error_path)
 class CNNBuilder2D(nn.Module):
     def __init__(self, config):
         super().__init__()

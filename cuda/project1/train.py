@@ -4,19 +4,20 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 import torchvision.utils as vutils
 from torch import nn, optim
-from torch.utils.data import DataLoader
 
-def train(model, train_data, device, hpset, num_workers):
+from preprocessing import load_data
+from utils import error_logger, gpu_logger, time_logger, basic_logger, global_log, send_log
+
+@error_logger(global_log.error_path)
+@gpu_logger(global_log.gpu_path)
+@time_logger(global_log.time_path)
+@basic_logger(global_log)
+def train(model, train_data, device, hpset, resultset, num_workers):
     # getting the training assets
     batch_size, optimizer, num_epochs = get_train_assets(hpset, model)
 
     # creating the data loader
-    train_loader = DataLoader(
-        train_data,
-        batch_size=batch_size,
-        shuffle=True,
-        num_workers=num_workers
-        )
+    train_loader = load_data(train_data, batch_size=batch_size, num_workers=num_workers)
 
     # Create a TensorBoard writer
     writer = SummaryWriter(log_dir="runs/baseline_experiment")
@@ -41,7 +42,7 @@ def train(model, train_data, device, hpset, num_workers):
         epoch_loss = running_loss / len(train_loader)
         # writer.add_scalar("Loss/train", epoch_loss, epoch)
 
-        print(f"Epoch {epoch+1}, Loss: {running_loss / len(train_loader):.4f}")
+        send_log(global_log.log_path, f"Epoch {epoch+1}, Loss: {running_loss / len(train_loader):.4f}")
 
 
 
@@ -72,6 +73,10 @@ def train(model, train_data, device, hpset, num_workers):
 
     # Run `tensorboard --logdir=runs` to visualize (in terminal)
 
+@error_logger(global_log.error_path)
+@gpu_logger(global_log.gpu_path)
+@time_logger(global_log.time_path)
+@basic_logger(global_log)
 def test(model, test_loader, device):
     model.eval()
     correct = 0
@@ -85,7 +90,7 @@ def test(model, test_loader, device):
             total += target.size(0)
             correct += (predicted == target).sum().item()
 
-    print(f"Test Accuracy: {100 * correct / total:.2f}%")
+    send_log(global_log.log_path, f"Test Accuracy: {100 * correct / total:.2f}%")
 
 
 # =======================================

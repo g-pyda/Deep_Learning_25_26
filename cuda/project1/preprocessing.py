@@ -3,6 +3,10 @@
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Subset
 
+from utils import error_logger, basic_logger, global_log
+
+@basic_logger(global_log)
+@error_logger(global_log.error_path)
 def get_data(config):
     # getting the data from configuration
     path = config["path"]
@@ -48,7 +52,7 @@ def get_data(config):
 
     return train_dataset, test_dataset
 
-def load_data(dataset, subset_size=None, batch_size=32, shuffle=False):
+def load_data(dataset, subset_size=None, batch_size=32, shuffle=False, num_workers=4):
     # generating the subset if needed
     subset = dataset
     if subset_size:
@@ -58,7 +62,8 @@ def load_data(dataset, subset_size=None, batch_size=32, shuffle=False):
     loader = DataLoader(
         subset,
         batch_size=batch_size,
-        shuffle=shuffle
+        shuffle=shuffle,
+        num_workers=num_workers
     )
 
     return loader

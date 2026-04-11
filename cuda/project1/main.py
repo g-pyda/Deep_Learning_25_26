@@ -58,12 +58,13 @@ if __name__ == "__main__":
     train_ds, test_ds = get_data(config['data'])
 
     hyperparameters = permute_hyperparams(config["hyperparameters"])
+    resultset = config["results"]
     for model_nr, hpset in enumerate(hyperparameters):
         # model initialization
         model = CNNBuilder(config["model_layers"]).to(device)
 
         # model training
-        train(model, model_nr, train_ds, device, hpset, num_workers)
+        train(model, model_nr, train_ds, device, hpset, resultset, num_workers)
 
         # model evaluation
         test(model, test_ds, device)
